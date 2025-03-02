@@ -1,0 +1,98 @@
+basePath: /
+definitions:
+  authcontroller.createSessionResponseBody:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+    type: object
+  authcontroller.refreshSessionRequestBody:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+    type: object
+  authcontroller.refreshSessionResponseBody:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+    type: object
+  httputils.HTTPError:
+    properties:
+      error:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: Service that manages access and refresh tokens.
+  title: Access tokens management service
+  version: "1.0"
+paths:
+  /sessions:
+    post:
+      description: Create new access and refresh tokens given user ID
+      parameters:
+      - description: User ID
+        in: query
+        name: userID
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success
+          schema:
+            $ref: '#/definitions/authcontroller.createSessionResponseBody'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/httputils.HTTPError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/httputils.HTTPError'
+      summary: Create new session
+      tags:
+      - session
+  /sessions/refresh:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Create a new access and refresh tokens pair from given access and refresh tokens.
+        Provided refresh token is invalidated on success.
+        Provided refresh token should have been issued with provided access token.
+        Provided access token can be expired, but refresh token can't.
+      parameters:
+      - description: Access and refresh tokens
+        in: body
+        name: access_and_refresh_tokens
+        schema:
+          $ref: '#/definitions/authcontroller.refreshSessionRequestBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success
+          schema:
+            $ref: '#/definitions/authcontroller.refreshSessionResponseBody'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/httputils.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputils.HTTPError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/httputils.HTTPError'
+      summary: Refresh session
+      tags:
+      - session
+swagger: "2.0"
